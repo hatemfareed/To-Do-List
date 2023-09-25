@@ -96,7 +96,7 @@
                     <span>{{$item->task}} {{$item->id}}</span>
                     <form class="delete-task" action="/delete-task/{{$item->id}}" method="POST">
                         @csrf
-                       {{-- <input type="hidden"  id='id_task' > --}}
+                        @method('delete')
                     <button class="delete-btn" value="{{$item->id}}">Delete</button>
                     </form>
                 </li>
@@ -104,12 +104,16 @@
             @endforeach
         </div>
         
+            {{$tasks->links()}} 
+        
     </div>
+    
     <div id="error-container" class="error-message"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script src="http://cdn.bootcss.com/toastr.js/latest/js/toastr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 <script>
 $.ajaxSetup({
 headers: {
@@ -127,7 +131,7 @@ headers: {
             
             $.ajax({
                 url:"/delete-task/"+id+"",
-                method:'POST',
+                method:'delete',
                 data:{id:id},
                 success:function(res){
                     if(res.status == 'success'){
@@ -215,7 +219,6 @@ headers: {
                         $('.add-form')[0].reset();
                         $('.todo-container').load(location.href + ' .todo-container');
                         Command: toastr["success"]("Task add!", "Success")
-
                         toastr.options = {
                         "closeButton": true,
                         "debug": false,
@@ -237,7 +240,26 @@ headers: {
                 },error:function(err){
                     let error = err.responseJSON;
                     $.each(error.errors,function(index,value){
-                        $('.error-message').append('<span class="text-danger">'+value+'</span>'+'<br>');
+                        // $('.error-message').append('<span class="text-danger">'+value+'</span>'+'<br>');
+                        Command: toastr["error"](value, "Error")
+
+                        toastr.options = {
+                        "closeButton": true,
+                        "debug": false,
+                        "newestOnTop": false,
+                        "progressBar": true,
+                        "positionClass": "toast-top-right",
+                        "preventDuplicates": false,
+                        "onclick": null,
+                        "showDuration": "300",
+                        "hideDuration": "1000",
+                        "timeOut": "5000",
+                        "extendedTimeOut": "1000",
+                        "showEasing": "swing",
+                        "hideEasing": "linear",
+                        "showMethod": "fadeIn",
+                        "hideMethod": "fadeOut"
+                        }
                     }) 
                 }
             });

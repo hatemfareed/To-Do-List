@@ -5,11 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Task;
 
+
 class tasksController extends Controller
 {
     public function index()
     {
-        $task = Task::orderBy('id')->get();
+        $task = Task::paginate(5);
         return view('tasks')->with('tasks' , $task);
     }
     public function store(Request $request)
