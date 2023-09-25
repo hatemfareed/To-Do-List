@@ -4,6 +4,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="http://cdn.bootcss.com/toastr.js/latest/css/toastr.min.css">
     
     <title>To-Do List</title>
     <style>
@@ -65,6 +66,7 @@
 </head>
 <body>
     <div class="todo-container">
+        
         <div class="todo-header">
             <h1>To-Do List</h1>
         </div>
@@ -76,25 +78,38 @@
                 <button class = "add-tasks">Add</button>
             </div>
         </form>
-        @foreach ($tasks as $item)
+        
+        
+        
+        <div class = 'container'>
+            @foreach ($tasks as $item)
             <ul class="todo-list">
                 <li class="todo-item">
-                    <input type="checkbox">
-                    <span>{{$item->task}}</span>
+                    <form class='complete-task' action="/complete-task/{{$item->id}}" method="put">
+                        @csrf
+                        @if($item->iscompleted == 1)
+                            <input class='complete' type="checkbox" value="{{$item->id}}" checked >
+                        @else
+                            <input class='complete' type="checkbox"  value="{{$item->id}}">
+                        @endif
+                    </form>
+                    <span>{{$item->task}} {{$item->id}}</span>
                     <form class="delete-task" action="/delete-task/{{$item->id}}" method="POST">
                         @csrf
-                        @method('DELETE')
-                       <input type="hidden" class='id' name="id" value="{{$item->id}}">
-                    <button class="delete-btn">Delete</button>
+                       {{-- <input type="hidden"  id='id_task' > --}}
+                    <button class="delete-btn" value="{{$item->id}}">Delete</button>
                     </form>
                 </li>
             </ul>
-        @endforeach
+            @endforeach
+        </div>
+        
     </div>
     <div id="error-container" class="error-message"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="http://cdn.bootcss.com/toastr.js/latest/js/toastr.min.js"></script>
 <script>
 $.ajaxSetup({
 headers: {
@@ -105,6 +120,88 @@ headers: {
 <script>
     $(document).ready(function(){
         // alert('hello');
+        $(document).on('click','.delete-btn',function(e){
+            e.preventDefault();
+            let id = $(this).val();
+            
+            
+            $.ajax({
+                url:"/delete-task/"+id+"",
+                method:'POST',
+                data:{id:id},
+                success:function(res){
+                    if(res.status == 'success'){
+                        $('.todo-container').load(location.href + ' .todo-container');
+                        Command: toastr["success"]("Task deleted!", "Success")
+
+                        toastr.options = {
+                        "closeButton": true,
+                        "debug": false,
+                        "newestOnTop": false,
+                        "progressBar": true,
+                        "positionClass": "toast-top-right",
+                        "preventDuplicates": false,
+                        "onclick": null,
+                        "showDuration": "300",
+                        "hideDuration": "1000",
+                        "timeOut": "5000",
+                        "extendedTimeOut": "1000",
+                        "showEasing": "swing",
+                        "hideEasing": "linear",
+                        "showMethod": "fadeIn",
+                        "hideMethod": "fadeOut"
+                        }
+                    }
+                },error:function(err){
+                    let error = err.responseJSON;
+                    $.each(error.errors,function(index,value){
+                        $('.error-message').append('<span class="text-danger">'+value+'</span>'+'<br>');
+                    })
+                    
+                }
+            })
+        })
+
+        $(document).on('click','.complete',function(e){
+            e.preventDefault();
+            let id = $(this).val();
+            $.ajax({
+                url:"/complete-task/"+id+"",
+                method:'put',
+                data:{id:id},
+                success:function(res){
+                    if(res.status == 'success'){
+                        $('.todo-container').load(location.href + ' .todo-container');
+                        Command: toastr["success"]("Task completed!", "Success")
+
+                        toastr.options = {
+                        "closeButton": true,
+                        "debug": false,
+                        "newestOnTop": false,
+                        "progressBar": true,
+                        "positionClass": "toast-top-right",
+                        "preventDuplicates": false,
+                        "onclick": null,
+                        "showDuration": "300",
+                        "hideDuration": "1000",
+                        "timeOut": "5000",
+                        "extendedTimeOut": "1000",
+                        "showEasing": "swing",
+                        "hideEasing": "linear",
+                        "showMethod": "fadeIn",
+                        "hideMethod": "fadeOut"
+                        }
+                    }
+                },error:function(err){
+                    let error = err.responseJSON;
+                    $.each(error.errors,function(index,value){
+                        $('.error-message').append('<span class="text-danger">'+value+'</span>'+'<br>');
+                    })
+                    
+                }
+            })
+        })
+
         $(document).on('click','.add-tasks',function(e){
             e.preventDefault();
             let task = $('#task').val();
@@ -117,44 +214,39 @@ headers: {
                     if(res.status == 'success'){
                         $('.add-form')[0].reset();
                         $('.todo-container').load(location.href + ' .todo-container');
+                        Command: toastr["success"]("Task add!", "Success")
 
+                        toastr.options = {
+                        "closeButton": true,
+                        "debug": false,
+                        "newestOnTop": false,
+                        "progressBar": true,
+                        "positionClass": "toast-top-right",
+                        "preventDuplicates": false,
+                        "onclick": null,
+                        "showDuration": "300",
+                        "hideDuration": "1000",
+                        "timeOut": "5000",
+                        "extendedTimeOut": "1000",
+                        "showEasing": "swing",
+                        "hideEasing": "linear",
+                        "showMethod": "fadeIn",
+                        "hideMethod": "fadeOut"
+                        }
                     }
-
                 },error:function(err){
                     let error = err.responseJSON;
                     $.each(error.errors,function(index,value){
                         $('.error-message').append('<span class="text-danger">'+value+'</span>'+'<br>');
-                    })
-                    
+                    }) 
                 }
             });
-
         })
 
-        $(document).on('click','.delete-btn',function(e){
-            e.preventDefault();
-            let id = $('.id').val();
-            
-            $.ajax({
-                url:"/delete-task/"+id+"",
-                method:'DELETE',
-                data:{id:id},
-                success:function(res){
-                    if(res.status == 'success'){
-                        $('.todo-container').load(location.href + ' .todo-container');
-                    }
-                },error:function(err){
-                    let error = err.responseJSON;
-                    $.each(error.errors,function(index,value){
-                        $('.error-message').append('<span class="text-danger">'+value+'</span>'+'<br>');
-                    })
-                    
-                }
-            })
-        })
+        
     });
 </script>
-
+{!! Toastr::message() !!}
 </body>
 </html>
 

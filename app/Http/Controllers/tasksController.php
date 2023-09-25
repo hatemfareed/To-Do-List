@@ -9,7 +9,7 @@ class tasksController extends Controller
 {
     public function index()
     {
-        $task = Task::orderBy('id' , 'desc')->get();
+        $task = Task::orderBy('id')->get();
         return view('tasks')->with('tasks' , $task);
     }
     public function store(Request $request)
@@ -34,5 +34,16 @@ class tasksController extends Controller
             'status' => 'success',
         ]);
         
+    }
+    public function complete(Task $task)
+    {
+        if ($task->iscompleted) {
+            $task->iscompleted = 0;
+        } else
+            $task->iscompleted = 1;
+        $task->save();
+        return response()->json([
+            'status' => 'success',
+        ]);
     }
 }

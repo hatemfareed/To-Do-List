@@ -18,4 +18,5 @@ use App\Models\Task;
 
 Route::get('/' ,[tasksController::class, 'index']);
 Route::post('/add-task/' ,[tasksController::class, 'store'])->name('add.task');
-Route::delete('/delete-task/{task}' ,[tasksController::class, 'destroy'])->name('delete.task');
+Route::post('/delete-task/{task}' ,[tasksController::class, 'destroy'])->name('delete.task');
+Route::put('/complete-task/{task}' , [tasksController::class, 'complete'])->name('complete.task');
